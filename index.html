@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Generator MVP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Content Generator</h1>
+        
+        <!-- Phần nhập dữ liệu -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2>Nhập thông tin cơ bản</h2>
+            </div>
+            <div class="card-body">
+                <form id="inputForm">
+                    <div class="mb-3">
+                        <label for="productService" class="form-label">Sản phẩm/Dịch vụ cung cấp</label>
+                        <input type="text" class="form-control" id="productService" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="targetCustomer" class="form-label">Đối tượng khách hàng chính</label>
+                        <input type="text" class="form-control" id="targetCustomer" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="businessField" class="form-label">Lĩnh vực kinh doanh chính</label>
+                        <input type="text" class="form-control" id="businessField" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Tạo chủ đề</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Phần hiển thị 30 câu chủ đề -->
+        <div class="card mb-4" id="topicsSection" style="display: none;">
+            <div class="card-header bg-success text-white">
+                <h2>30 Chủ đề gợi ý</h2>
+                <p>Vui lòng chọn 7 chủ đề bạn muốn phát triển</p>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Question</th>
+                            <th>Selected?</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topicsTable">
+                        <!-- Topics will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+                <button id="confirmSelection" class="btn btn-success mt-3">Xác nhận lựa chọn</button>
+            </div>
+        </div>
+        
+        <!-- Phần hiển thị 7 câu đã chọn -->
+        <div class="card" id="selectedTopicsSection" style="display: none;">
+            <div class="card-header bg-info text-white">
+                <h2>7 Chủ đề đã chọn</h2>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="topicsAccordion">
+                    <!-- Selected topics will be populated here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
