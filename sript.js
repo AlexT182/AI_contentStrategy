@@ -3,13 +3,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f';
     const AUTH_TOKEN_KEY = 'ct_strategy_token';
     const TOKEN_EXPIRY_KEY = 'ct_token_expiry';
-    const TOKEN_VALIDITY = 3600 * 1000; // 1 giờ (ms)
+    const REFRESH_THRESHOLD = 300000; // 5 phút (ms) trước khi hết hạn thì refresh
 
     // ========== DOM ELEMENTS ==========
     const loginBtn = document.getElementById('loginBtn');
     const loginModal = document.getElementById('loginModal');
     const modalOverlay = document.getElementById('modalOverlay');
-    const closeModal = loginModal.querySelector('.close'); // Lấy close từ modal
+    const closeModal = loginModal.querySelector('.close');
     const submitLogin = document.getElementById('submitLogin');
     const inputForm = document.getElementById('inputForm');
     const topicsSection = document.getElementById('topicsSection');
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== STATE ==========
     let sessionToken = getAuthToken();
+    let tokenExpiry = localStorage.getItem(TOKEN_EXPIRY_KEY);
     let generatedTopics = [];
     let selectedTopics = [];
 
@@ -36,27 +37,47 @@ document.addEventListener('DOMContentLoaded', function() {
         return token;
     }
 
-    function setAuthToken(token) {
+    function setAuthToken(token, expiresIn) {
+        const expiry = Date.now() + (expiresIn * 1000); // Chuyển expires_in từ giây sang ms
         localStorage.setItem(AUTH_TOKEN_KEY, token);
-        localStorage.setItem(TOKEN_EXPIRY_KEY, Date.now() + TOKEN_VALIDITY);
+        localStorage.setItem(TOKEN_EXPIRY_KEY, expiry);
         sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+        sessionToken = token;
+        tokenExpiry = expiry;
     }
 
     function clearAuthData() {
         localStorage.removeItem(AUTH_TOKEN_KEY);
         localStorage.removeItem(TOKEN_EXPIRY_KEY);
         sessionStorage.removeItem(AUTH_TOKEN_KEY);
+        sessionToken = null;
+        tokenExpiry = null;
+        updateAuthUI();
     }
 
     function updateAuthUI() {
         if (sessionToken) {
-            loginBtn.textContent = 'Đã đăng nhập';
-            loginBtn.classList.add('btn-success');
-            loginBtn.classList.remove('btn-outline-secondary');
+            loginBtn.textContent = 'Đăng xuất';
+            loginBtn.classList.add('btn-danger');
+            loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
         } else {
             loginBtn.textContent = 'Đăng nhập';
-            loginBtn.classList.remove('btn-success');
+            loginBtn.classList.remove('btn-danger', 'btn-success');
             loginBtn.classList.add('btn-outline-secondary');
+        }
+    }
+
+    async function refreshToken() {
+        try {
+            const response = await callWebhook('refresh_token', {});
+            if (response.success && response.session_token && response.expires_in) {
+                setAuthToken(response.session_token, response.expires_in);
+                console.log('Token refreshed successfully');
+            }
+        } catch (error) {
+            console.error('Refresh token failed:', error);
+            clearAuthData();
+            showLoginModal();
         }
     }
 
@@ -75,9 +96,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========== API FUNCTIONS ==========
     async function callWebhook(action, data) {
         const token = getAuthToken();
-        if (!token && action !== 'auth') {
+        if (!token && action !== 'auth' && action !== 'refresh_token') {
             showLoginModal();
             throw new Error('Vui lòng đăng nhập');
+        }
+
+        // Kiểm tra và làm mới token nếu sắp hết hạn
+        if (token && tokenExpiry && (tokenExpiry - Date.now() < REFRESH_THRESHOLD) && action !== 'refresh_token') {
+            await refreshToken();
         }
 
         const payload = {
@@ -99,8 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 if (response.status === 401) {
                     clearAuthData();
-                    updateAuthUI();
                     showLoginModal();
+                    throw new Error('Phiên đăng nhập hết hạn');
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -114,7 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== EVENT HANDLERS ==========
     loginBtn.addEventListener('click', () => {
-        if (!sessionToken) {
+        if (sessionToken) {
+            clearAuthData();
+        } else {
             showLoginModal();
         }
     });
@@ -137,9 +165,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading();
             const response = await callWebhook('auth', { username, password });
 
-            if (response.success) {
-                sessionToken = response.token;
-                setAuthToken(sessionToken);
+            if (response.success && response.session_token && response.expires_in) {
+                setAuthToken(response.session_token, response.expires_in);
                 updateAuthUI();
                 hideLoginModal();
             } else {
@@ -158,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!sessionToken) {
             alert('Vui lòng đăng nhập trước');
+            showLoginModal();
             return;
         }
 
@@ -185,17 +213,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const generateResponse = await callWebhook('generate', inputs);
 
-            if (generateResponse.success) {
+            if (generateResponse.success && generateResponse.topics) {
                 generatedTopics = generateResponse.topics;
                 displayGeneratedTopics();
                 topicsSection.style.display = 'block';
                 document.getElementById('inputSection').style.display = 'none';
             } else {
-                alert('Lỗi khi tạo chủ đề: ' + generateResponse.message);
+                alert('Lỗi khi tạo chủ đề: ' + (generateResponse.message || 'Không có dữ liệu'));
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra');
+            console.error('Submit error:', error);
+            alert('Có lỗi xảy ra: ' + error.message);
         } finally {
             hideLoading();
         }
@@ -206,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading();
             const response = await callWebhook('ai_select', { topics: generatedTopics });
 
-            if (response.success) {
+            if (response.success && response.selectedIds) {
                 document.querySelectorAll('.topic-checkbox').forEach(cb => {
                     cb.checked = false;
                     cb.closest('tr').classList.remove('selected-row');
@@ -246,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading();
             const response = await callWebhook('finalize', { topics: selectedTopics });
 
-            if (response.success) {
+            if (response.success && response.content) {
                 displayFinalContent(response.content);
                 topicsSection.style.display = 'none';
                 resultSection.style.display = 'block';
@@ -349,14 +377,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========== INIT ==========
     updateAuthUI();
 
+    // Kiểm tra và làm mới token định kỳ
     setInterval(() => {
-        if (sessionToken && loginModal.style.display !== 'block') {
-            fetch(`${WEBHOOK_URL}/check-token`, {
-                headers: { 'Authorization': `Bearer ${sessionToken}` }
-            }).catch(() => {
-                clearAuthData();
-                updateAuthUI();
-            });
+        if (sessionToken && tokenExpiry && (tokenExpiry - Date.now() < REFRESH_THRESHOLD)) {
+            refreshToken();
         }
-    }, 300000); // 5 phút
+    }, 60000); // Kiểm tra mỗi phút
 });
