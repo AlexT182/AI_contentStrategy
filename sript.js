@@ -45,16 +45,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cập nhật giao diện nút
     function updateAuthUI() {
-        if (sessionToken) {
-            loginBtn.textContent = 'Đăng xuất';
-            loginBtn.classList.add('btn-danger');
-            loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
-        } else {
-            loginBtn.textContent = 'Đăng nhập';
-            loginBtn.classList.remove('btn-danger', 'btn-success');
-            loginBtn.classList.add('btn-outline-secondary');
-        }
+    console.log('Update UI, sessionToken:', sessionToken); // Debug
+    if (sessionToken) {
+        loginBtn.textContent = 'Đăng xuất';
+        loginBtn.classList.add('btn-danger');
+        loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
+    } else {
+        loginBtn.textContent = 'Đăng nhập';
+        loginBtn.classList.remove('btn-danger', 'btn-success');
+        loginBtn.classList.add('btn-outline-secondary');
     }
+}
 
     // Gọi webhook
     async function callWebhook(action, data) {
@@ -98,32 +99,36 @@ document.addEventListener('DOMContentLoaded', function() {
     modalOverlay.addEventListener('click', hideLoginModal);
 
     // Xử lý đăng nhập
-    submitLogin.addEventListener('click', async () => {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+   submitLogin.addEventListener('click', async () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-        if (!username || !password) {
-            document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
-            return;
+    if (!username || !password) {
+        document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
+        return;
+    }
+
+    try {
+        console.log('1. Bắt đầu đăng nhập:', { username, password });
+        showLoading();
+        const response = await callWebhook('auth', { username, password });
+        console.log('2. Response từ webhook:', response);
+
+        if (response.success && response.user && response.user.session_token && response.user.expires_in) {
+            console.log('3. Đăng nhập thành công, token:', response.user.session_token);
+            setAuthToken(response.user.session_token, response.user.expires_in);
+            hideLoginModal();
+        } else {
+            console.log('4. Đăng nhập thất bại:', response);
+            document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
         }
-
-        try {
-            showLoading();
-            const response = await callWebhook('auth', { username, password });
-
-            if (response.success && response.user && response.user.session_token && response.user.expires_in) {
-                setAuthToken(response.user.session_token, response.user.expires_in);
-                hideLoginModal();
-            } else {
-                document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            document.getElementById('loginError').textContent = 'Lỗi kết nối';
-        } finally {
-            hideLoading();
-        }
-    });
+    } catch (error) {
+        console.error('5. Lỗi kết nối:', error);
+        document.getElementById('loginError').textContent = 'Lỗi kết nối';
+    } finally {
+        hideLoading();
+    }
+});
 
     // Các hàm hiển thị/ẩn
     function showLoginModal() {
