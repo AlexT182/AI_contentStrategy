@@ -39,16 +39,25 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
 }
 
+.card-header {
+    padding: 1.5rem;
+    font-size: 1.25rem;
+}
+
+/* Gradient background */
 .bg-gradient-primary {
-    background: linear-gradient(45deg, #007bff, #00c4ff);
+    background: linear-gradient(45deg, #007bff, #00c4ff) !important;
+    color: #fff !important;
 }
 
 .bg-gradient-success {
-    background: linear-gradient(45deg, #28a745, #34d058);
+    background: linear-gradient(45deg, #28a745, #34d058) !important;
+    color: #fff !important;
 }
 
 .bg-gradient-info {
-    background: linear-gradient(45deg, #17a2b8, #1ccad8);
+    background: linear-gradient(45deg, #17a2b8, #1ccad8) !important;
+    color: #fff !important;
 }
 
 /* Input và Button */
