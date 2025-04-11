@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Roboto', Arial, sans-serif;
-    background: linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 100%); /* Gradient tím nhẹ */
+    background: linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 100%);
     color: #333;
     line-height: 1.6;
     padding: 30px;
@@ -33,7 +33,7 @@ body {
 }
 
 h2, h3 {
-    color: #800080; /* Tím đậm */
+    color: #800080;
     margin-bottom: 30px;
     font-weight: 700;
     text-transform: uppercase;
@@ -45,7 +45,15 @@ h2, h3 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
+    gap: 20px; /* Thêm khoảng cách giữa chữ và nút */
     flex-wrap: wrap;
+}
+
+.header h2 {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .form-group {
@@ -56,7 +64,7 @@ h2, h3 {
 input[type="text"], input[type="password"] {
     width: 100%;
     padding: 16px;
-    border: 2px solid #D8BFD8; /* Tím nhạt */
+    border: 2px solid #D8BFD8;
     border-radius: 8px;
     font-size: 16px;
     background: #F8F8FF;
@@ -72,7 +80,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 
 button {
     padding: 16px 32px;
-    background: linear-gradient(45deg, #800080, #BA55D3); /* Gradient tím */
+    background: linear-gradient(45deg, #800080, #BA55D3);
     color: white;
     border: none;
     border-radius: 8px;
@@ -91,8 +99,11 @@ button:hover {
 }
 
 .logout-btn {
+    padding: 10px 20px; /* Giảm kích thước nút Đăng xuất */
+    font-size: 14px;
     background: linear-gradient(45deg, #D8BFD8, #E6E6FA);
     color: #333;
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -210,5 +221,10 @@ button:hover {
     button {
         padding: 12px;
         font-size: 14px;
+    }
+
+    .logout-btn {
+        padding: 8px 16px; /* Giảm thêm trên mobile */
+        font-size: 12px;
     }
 }

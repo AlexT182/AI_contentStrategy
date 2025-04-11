@@ -2,9 +2,19 @@ const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-b
 let sheetLink = '';
 
 async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
     const message = document.getElementById('login-message');
+
+    // Validation
+    if (!username) {
+        message.textContent = 'Vui lòng nhập Username';
+        return;
+    }
+    if (!password) {
+        message.textContent = 'Vui lòng nhập Password';
+        return;
+    }
 
     try {
         const response = await fetch(WEBHOOK_URL, {
@@ -45,11 +55,31 @@ function logout() {
 
 async function submitInput() {
     const userID = localStorage.getItem('userID');
-    const product = document.getElementById('product').value;
-    const targetCust = document.getElementById('targetCust').value;
-    const field = document.getElementById('field').value;
+    const product = document.getElementById('product').value.trim();
+    const targetCust = document.getElementById('targetCust').value.trim();
+    const field = document.getElementById('field').value.trim();
     const message = document.getElementById('input-message');
     const continueBtn = document.getElementById('continue-btn');
+
+    // Validation
+    if (!product) {
+        message.textContent = 'Vui lòng nhập Sản phẩm/Dịch vụ';
+        message.style.color = '#D8000C';
+        continueBtn.style.display = 'none';
+        return;
+    }
+    if (!targetCust) {
+        message.textContent = 'Vui lòng nhập Đối tượng khách hàng';
+        message.style.color = '#D8000C';
+        continueBtn.style.display = 'none';
+        return;
+    }
+    if (!field) {
+        message.textContent = 'Vui lòng nhập Lĩnh vực kinh doanh';
+        message.style.color = '#D8000C';
+        continueBtn.style.display = 'none';
+        return;
+    }
 
     try {
         const response = await fetch(WEBHOOK_URL, {
