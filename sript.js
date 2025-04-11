@@ -1,83 +1,58 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('1. Script loaded'); // Kiểm tra script chạy không
-    const WEBHOOK_URL = 'https://your-n8n-instance/webhook/abc123'; // Thay bằng URL thực tế
-    const AUTH_TOKEN_KEY = 'ct_strategy_token';
-    const TOKEN_EXPIRY_KEY = 'ct_token_expiry';
-    let sessionToken = getAuthToken();
-    let tokenExpiry;
+    const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook-test/36dbb972-ca19-48ac-bd79-8ab661b88d4f'; // Thay bằng URL thực tế
+    const USERNAME_KEY = 'ct_username';
+    const USERID_KEY = 'ct_userid';
+    let currentUsername = localStorage.getItem(USERNAME_KEY);
+    let currentUserID = localStorage.getItem(USERID_KEY);
 
     const loginBtn = document.getElementById('loginBtn');
+    const authStatus = document.getElementById('authStatus');
     const loginModal = document.getElementById('loginModal');
     const modalOverlay = document.getElementById('modalOverlay');
     const closeModal = loginModal.querySelector('.close');
     const submitLogin = document.getElementById('submitLogin');
-
-    console.log('2. Elements:', { loginBtn, submitLogin }); // Kiểm tra DOM elements
-
-    function getAuthToken() {
-        const token = localStorage.getItem(AUTH_TOKEN_KEY) || sessionStorage.getItem(AUTH_TOKEN_KEY);
-        const expiry = localStorage.getItem(TOKEN_EXPIRY_KEY);
-        if (token && expiry && Date.now() > parseInt(expiry)) {
-            clearAuthData();
-            return null;
-        }
-        return token;
-    }
-
-    function setAuthToken(token, expiresIn) {
-        console.log('5. Set token:', token, expiresIn);
-        const expiry = Date.now() + (expiresIn * 1000);
-        localStorage.setItem(AUTH_TOKEN_KEY, token);
-        localStorage.setItem(TOKEN_EXPIRY_KEY, expiry);
-        sessionStorage.setItem(AUTH_TOKEN_KEY, token);
-        sessionToken = token;
-        tokenExpiry = expiry;
-        updateAuthUI();
-    }
-
-    function clearAuthData() {
-        console.log('6. Clear auth data');
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        localStorage.removeItem(TOKEN_EXPIRY_KEY);
-        sessionStorage.removeItem(AUTH_TOKEN_KEY);
-        sessionToken = null;
-        tokenExpiry = null;
-        updateAuthUI();
-    }
+    const inputForm = document.getElementById('inputForm');
+    const questionsSection = document.getElementById('questionsSection');
+    const questionsTable = document.getElementById('questionsTable');
+    const aiSelectBtn = document.getElementById('aiSelectBtn');
+    const submitQuestionsBtn = document.getElementById('submitQuestionsBtn');
+    const contentsSection = document.getElementById('contentsSection');
+    const contentsTable = document.getElementById('contentsTable');
 
     function updateAuthUI() {
-        console.log('7. Update UI, sessionToken:', sessionToken);
-        if (sessionToken) {
+        if (currentUsername && currentUserID) {
+            authStatus.innerHTML = `Xin chào ${currentUsername} <span class="badge bg-success">Đã đăng nhập</span>`;
             loginBtn.textContent = 'Đăng xuất';
+            loginBtn.classList.remove('btn-outline-secondary');
             loginBtn.classList.add('btn-danger');
-            loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
+            inputForm.style.display = 'block';
         } else {
+            authStatus.innerHTML = '';
             loginBtn.textContent = 'Đăng nhập';
-            loginBtn.classList.remove('btn-danger', 'btn-success');
+            loginBtn.classList.remove('btn-danger');
             loginBtn.classList.add('btn-outline-secondary');
+            inputForm.style.display = 'none';
+            questionsSection.style.display = 'none';
+            contentsSection.style.display = 'none';
         }
     }
 
     async function callWebhook(action, data) {
-        const token = getAuthToken();
-        const payload = { action, sessionToken: token, ...data };
-        console.log('3. Gửi payload:', payload);
+        const payload = { action, userID: currentUserID, username: currentUsername, ...data };
         try {
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token || ''}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             const result = await response.json();
-            console.log('4. Response:', result);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            if (result.user && result.user.session_token && result.user.expires_in) {
-                setAuthToken(result.user.session_token, result.user.expires_in);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (action === 'auth' && result.success && result.user && result.user.username && result.user.userID) {
+                localStorage.setItem(USERNAME_KEY, result.user.username);
+                localStorage.setItem(USERID_KEY, result.user.userID);
+                currentUsername = result.user.username;
+                currentUserID = result.user.userID;
+                updateAuthUI();
             }
             return result;
         } catch (error) {
@@ -87,9 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loginBtn.addEventListener('click', () => {
-        console.log('8. Login button clicked, sessionToken:', sessionToken);
-        if (sessionToken) {
-            clearAuthData();
+        if (currentUserID) {
+            localStorage.removeItem(USERNAME_KEY);
+            localStorage.removeItem(USERID_KEY);
+            currentUsername = null;
+            currentUserID = null;
+            updateAuthUI();
         } else {
             showLoginModal();
         }
@@ -98,12 +76,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeModal) closeModal.addEventListener('click', hideLoginModal);
     modalOverlay.addEventListener('click', hideLoginModal);
 
-    console.log('9. Attaching submitLogin event');
     submitLogin.addEventListener('click', async () => {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-
-        console.log('10. Submit login clicked:', { username, password });
 
         if (!username || !password) {
             document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
@@ -113,23 +88,118 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             showLoading();
             const response = await callWebhook('auth', { username, password });
-            console.log('11. Response từ webhook:', response);
-
-            if (response.success && response.user && response.user.session_token && response.user.expires_in) {
-                console.log('12. Đăng nhập thành công');
-                setAuthToken(response.user.session_token, response.user.expires_in);
+            if (response.success && response.user && response.user.username && response.user.userID) {
                 hideLoginModal();
             } else {
-                console.log('13. Đăng nhập thất bại:', response);
                 document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
             }
         } catch (error) {
-            console.error('14. Lỗi kết nối:', error);
             document.getElementById('loginError').textContent = 'Lỗi kết nối';
         } finally {
             hideLoading();
         }
     });
+
+    inputForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUserID) {
+            showLoginModal();
+            return;
+        }
+
+        const productService = document.getElementById('productService').value;
+        const targetCustomer = document.getElementById('targetCustomer').value;
+        const businessField = document.getElementById('businessField').value;
+
+        try {
+            showLoading();
+            const response = await callWebhook('generate_questions', { productService, targetCustomer, businessField });
+            if (response.success && response.questions) {
+                displayQuestions(response.questions);
+                questionsSection.style.display = 'block';
+                contentsSection.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Generate questions error:', error);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    aiSelectBtn.addEventListener('click', async () => {
+        try {
+            showLoading();
+            const response = await callWebhook('ai_select', {});
+            if (response.success && response.questions) {
+                displayQuestions(response.questions);
+                checkSelectedCount();
+            }
+        } catch (error) {
+            console.error('AI select error:', error);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    submitQuestionsBtn.addEventListener('click', async () => {
+        const selectedQuestions = Array.from(questionsTable.querySelectorAll('input[type="checkbox"]:checked'))
+            .map(cb => JSON.parse(cb.dataset.question));
+        if (selectedQuestions.length !== 7) {
+            alert('Vui lòng chọn đúng 7 câu hỏi!');
+            return;
+        }
+
+        try {
+            showLoading();
+            const response = await callWebhook('generate_contents', { questions: selectedQuestions });
+            if (response.success && response.contents) {
+                displayContents(response.contents);
+                questionsSection.style.display = 'none';
+                contentsSection.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Generate contents error:', error);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    function displayQuestions(questions) {
+        questionsTable.innerHTML = '';
+        questions.forEach(q => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${q.type}</td>
+                <td>${q.value}</td>
+                <td>${q.question}</td>
+                <td><input type="checkbox" ${q.selected ? 'checked' : ''} data-question='${JSON.stringify(q)}'></td>
+            `;
+            questionsTable.appendChild(row);
+        });
+        questionsTable.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', checkSelectedCount);
+        });
+    }
+
+    function checkSelectedCount() {
+        const selectedCount = questionsTable.querySelectorAll('input[type="checkbox"]:checked').length;
+        submitQuestionsBtn.disabled = selectedCount !== 7;
+    }
+
+    function displayContents(contents) {
+        contentsTable.innerHTML = '';
+        contents.forEach(c => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${c.question}</td>
+                <td>${c.topic}</td>
+                <td>${c.content}</td>
+                <td>${c.cta}</td>
+                <td>${c.funnel_stage}</td>
+            `;
+            contentsTable.appendChild(row);
+        });
+    }
 
     function showLoginModal() {
         modalOverlay.style.display = 'block';
@@ -159,5 +229,5 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loadingDiv) loadingDiv.style.display = 'none';
     }
 
-    updateAuthUI(); // Khởi tạo giao diện
+    updateAuthUI();
 });
