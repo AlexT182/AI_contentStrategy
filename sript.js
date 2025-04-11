@@ -1,16 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f';
-    const USERNAME_KEY = 'ct_username';
-    const USERID_KEY = 'ct_userid';
-    let currentUsername = localStorage.getItem(USERNAME_KEY);
-    let currentUserID = localStorage.getItem(USERID_KEY);
 
-    const loginBtn = document.getElementById('loginBtn');
-    const authStatus = document.getElementById('authStatus');
-    const loginModal = document.getElementById('loginModal');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const closeModal = loginModal.querySelector('.close');
-    const submitLogin = document.getElementById('submitLogin');
     const inputForm = document.getElementById('inputForm');
     const questionsSection = document.getElementById('questionsSection');
     const questionsTable = document.getElementById('questionsTable');
@@ -19,26 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentsSection = document.getElementById('contentsSection');
     const contentsTable = document.getElementById('contentsTable');
 
-    function updateAuthUI() {
-        if (currentUsername && currentUserID) {
-            authStatus.innerHTML = `Xin chào ${currentUsername} <span class="badge bg-success">Đã đăng nhập</span>`;
-            loginBtn.textContent = 'Đăng xuất';
-            loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
-            loginBtn.classList.add('btn-danger');
-            inputForm.style.display = 'block';
-        } else {
-            authStatus.innerHTML = '';
-            loginBtn.textContent = 'Đăng nhập';
-            loginBtn.classList.remove('btn-danger', 'btn-success');
-            loginBtn.classList.add('btn-outline-secondary');
-            inputForm.style.display = 'none';
-            questionsSection.style.display = 'none';
-            contentsSection.style.display = 'none';
-        }
-    }
-
     async function callWebhook(action, data) {
-        const payload = { action, userID: currentUserID, username: currentUsername, ...data };
+        const payload = { action, ...data };
         console.log('Sending payload:', payload);
         try {
             const response = await fetch(WEBHOOK_URL, {
@@ -50,13 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Raw response:', text);
             const result = text ? JSON.parse(text) : {};
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            if (action === 'auth' && result.success && result.user && result.user.username && result.user.userID) {
-                localStorage.setItem(USERNAME_KEY, result.user.username);
-                localStorage.setItem(USERID_KEY, result.user.userID);
-                currentUsername = result.user.username;
-                currentUserID = result.user.userID;
-                updateAuthUI();
-            }
             return result;
         } catch (error) {
             console.error(`API call failed for ${action}:`, error);
@@ -64,57 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    loginBtn.addEventListener('click', () => {
-        console.log('Login button clicked, userID:', currentUserID);
-        if (currentUserID) {
-            localStorage.removeItem(USERNAME_KEY);
-            localStorage.removeItem(USERID_KEY);
-            currentUsername = null;
-            currentUserID = null;
-            updateAuthUI();
-        } else {
-            showLoginModal();
-        }
-    });
-
-    if (closeModal) closeModal.addEventListener('click', hideLoginModal);
-    modalOverlay.addEventListener('click', hideLoginModal);
-
-    if (submitLogin) {
-        submitLogin.addEventListener('click', async () => {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
-                return;
-            }
-
-            try {
-                showLoading();
-                const response = await callWebhook('auth', { username, password });
-                if (response.success && response.user && response.user.username && response.user.userID) {
-                    hideLoginModal();
-                } else {
-                    document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
-                }
-            } catch (error) {
-                document.getElementById('loginError').textContent = 'Lỗi kết nối';
-            } finally {
-                hideLoading();
-            }
-        });
-    } else {
-        console.error('submitLogin element not found');
-    }
-
     inputForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!currentUserID) {
-            showLoginModal();
-            return;
-        }
-
         const productService = document.getElementById('productService').value;
         const targetCustomer = document.getElementById('targetCustomer').value;
         const businessField = document.getElementById('businessField').value;
@@ -211,17 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function showLoginModal() {
-        modalOverlay.style.display = 'block';
-        loginModal.style.display = 'block';
-    }
-
-    function hideLoginModal() {
-        modalOverlay.style.display = 'none';
-        loginModal.style.display = 'none';
-        document.getElementById('loginError').textContent = '';
-    }
-
     function showLoading() {
         let loadingDiv = document.getElementById('loadingOverlay');
         if (!loadingDiv) {
@@ -238,6 +143,4 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadingDiv = document.getElementById('loadingOverlay');
         if (loadingDiv) loadingDiv.style.display = 'none';
     }
-
-    updateAuthUI();
 });
