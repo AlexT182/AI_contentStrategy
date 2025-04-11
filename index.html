@@ -12,10 +12,10 @@
     <div id="login-form" class="container">
         <h2>Đăng nhập</h2>
         <div class="form-group">
-            <input type="text" id="username" placeholder="Username" />
+            <input type="text" id="username" placeholder="Username" required />
         </div>
         <div class="form-group">
-            <input type="password" id="password" placeholder="Password" />
+            <input type="password" id="password" placeholder="Password" required />
         </div>
         <button onclick="login()">Gửi</button>
         <p id="login-message" class="error-message"></p>
@@ -32,13 +32,13 @@
         <div id="input-form" class="container">
             <h3>Nhập thông tin</h3>
             <div class="form-group">
-                <input type="text" id="product" placeholder="Sản phẩm/Dịch vụ" />
+                <input type="text" id="product" placeholder="Sản phẩm/Dịch vụ" required />
             </div>
             <div class="form-group">
-                <input type="text" id="targetCust" placeholder="Đối tượng khách hàng" />
+                <input type="text" id="targetCust" placeholder="Đối tượng khách hàng" required />
             </div>
             <div class="form-group">
-                <input type="text" id="field" placeholder="Lĩnh vực kinh doanh" />
+                <input type="text" id="field" placeholder="Lĩnh vực kinh doanh" required />
             </div>
             <button onclick="submitInput()">Gửi</button>
             <p id="input-message" class="error-message"></p>
@@ -48,7 +48,7 @@
         <!-- Questions List -->
         <div id="questions" class="container" style="display: none;">
             <h3>Danh sách câu hỏi</h3>
-            <div id="question-list"></div>
+            <div id="question-list" class="question-list"></div>
             <div class="action-buttons">
                 <button onclick="userChoose()">Chọn</button>
                 <button onclick="aiChoose()">Nhờ AI chọn</button>
@@ -59,7 +59,7 @@
         <!-- SNS Content -->
         <div id="sns-content" class="container" style="display: none;">
             <h3>Nội dung SNS</h3>
-            <div id="content-list"></div>
+            <div id="content-list" class="content-list"></div>
             <div class="action-buttons">
                 <button onclick="getSheetLink()">Gửi link Google Sheet</button>
                 <button onclick="loadOldData()">Load dữ liệu cũ</button>

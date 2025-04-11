@@ -5,125 +5,168 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #E6E6FA; /* Tím nhẹ */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 100%); /* Gradient tím nhẹ */
     color: #333;
     line-height: 1.6;
     padding: 20px;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-5px);
 }
 
 h2, h3 {
     color: #800080; /* Tím đậm */
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-weight: 600;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 input[type="text"], input[type="password"] {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #D8BFD8; /* Tím nhạt */
-    border-radius: 4px;
+    padding: 14px;
+    border: 2px solid #D8BFD8; /* Tím nhạt */
+    border-radius: 6px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    background: #F8F8FF;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
     border-color: #800080;
+    box-shadow: 0 0 8px rgba(128, 0, 128, 0.3);
     outline: none;
 }
 
 button {
-    padding: 12px 24px;
-    background-color: #800080; /* Tím đậm */
+    padding: 14px 28px;
+    background: linear-gradient(45deg, #800080, #9932CC); /* Gradient tím */
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
 }
 
 button:hover {
-    background-color: #6A006A; /* Tím đậm hơn */
+    background: linear-gradient(45deg, #6A006A, #800080);
+    transform: translateY(-2px);
 }
 
 .logout-btn {
-    background-color: #D8BFD8; /* Tím nhạt */
+    background: #D8BFD8;
     color: #333;
 }
 
 .logout-btn:hover {
-    background-color: #C0A0C0;
+    background: #C0A0C0;
+    transform: translateY(-2px);
 }
 
 .error-message {
     color: #D8000C;
     min-height: 20px;
-    margin-top: 10px;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
-#question-list div {
+.question-list div {
     display: flex;
     align-items: center;
-    margin: 10px 0;
-    padding: 10px;
-    background-color: #F8F8FF;
-    border-radius: 4px;
-}
-
-#question-list input[type="checkbox"] {
-    margin-right: 15px;
-}
-
-#question-list input[type="text"] {
-    flex: 1;
-}
-
-#content-list .content-card {
-    background-color: #F8F8FF;
+    margin: 15px 0;
     padding: 15px;
-    margin: 10px 0;
-    border-radius: 4px;
+    background: #F8F8FF;
+    border-radius: 8px;
     border-left: 4px solid #800080;
+    transition: background 0.3s;
+}
+
+.question-list div:hover {
+    background: #F0F0FF;
+}
+
+.question-list input[type="checkbox"] {
+    margin-right: 20px;
+    transform: scale(1.2);
+}
+
+.question-list input[type="text"] {
+    flex: 1;
+    padding: 10px;
+}
+
+.content-list .content-card {
+    background: #F8F8FF;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 5px solid #800080;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.content-card:hover {
+    transform: translateY(-3px);
+}
+
+.content-card p {
+    margin: 10px 0;
+    font-size: 15px;
+}
+
+.content-card strong {
+    color: #800080;
 }
 
 .action-buttons {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 600px) {
     .container {
-        padding: 15px;
+        padding: 20px;
+        margin: 10px;
     }
 
     button {
         width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
 
     .action-buttons {
         flex-direction: column;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
     }
 }

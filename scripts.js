@@ -30,7 +30,7 @@ async function login() {
         }
     } catch (error) {
         console.error('Login error:', error);
-        message.textContent = 'Lỗi kết nối hoặc server, vui lòng thử lại';
+        message.textContent = `L paramỗi kết nối: ${error.message}`;
     }
 }
 
