@@ -1,4 +1,5 @@
 const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f';
+const N8N_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlNzNhMjk1YS1iZGUwLTRlODAtYjY2OS1jMmEyZWIxMmY0NmYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzQ0MzYwNzAwfQ.XLBJSE15EycTfSdPq5Yp1jgCBPoMuC4Oz9qE9Ldjq3g'; // Thay bằng API key từ n8n
 let sheetLink = '';
 
 async function login() {
@@ -21,13 +22,19 @@ async function login() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // Nếu webhook yêu cầu API key, thêm vào đây
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'auth', username, password })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            // Nếu parse JSON thất bại, lấy text thô
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             document.getElementById('login-form').style.display = 'none';
@@ -40,7 +47,7 @@ async function login() {
         }
     } catch (error) {
         console.error('Login error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }
 
@@ -86,27 +93,32 @@ async function submitInput() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // Nếu webhook yêu cầu API key, thêm vào đây
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'validateInput', userID, product, targetCust, field })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            // Nếu parse JSON thất bại, lấy text thô
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             message.textContent = 'Dữ liệu hợp lệ! Nhấn Tiếp tục để xem câu hỏi.';
             message.style.color = '#008000';
             continueBtn.style.display = 'block';
         } else {
-            // Hiển thị message từ WF thay vì thông báo chung chung
             message.textContent = result.message || 'Dữ liệu không hợp lệ';
             message.style.color = '#D8000C';
             continueBtn.style.display = 'none';
         }
     } catch (error) {
         console.error('Validate input error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
         message.style.color = '#D8000C';
         continueBtn.style.display = 'none';
     }
@@ -121,12 +133,18 @@ async function loadQuestions() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'getQuestions', userID })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             document.getElementById('input-form').style.display = 'none';
@@ -144,7 +162,7 @@ async function loadQuestions() {
         }
     } catch (error) {
         console.error('Load questions error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }
 
@@ -168,12 +186,18 @@ async function userChoose() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'userChoice', userID, questions })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             sheetLink = result.sheetLink;
@@ -183,7 +207,7 @@ async function userChoose() {
         }
     } catch (error) {
         console.error('User choose error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }
 
@@ -196,12 +220,18 @@ async function aiChoose() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'aiChoice', userID })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             sheetLink = result.sheetLink;
@@ -211,7 +241,7 @@ async function aiChoose() {
         }
     } catch (error) {
         console.error('AI choose error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }
 
@@ -224,12 +254,18 @@ async function loadSNSContent() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'getSNSContent', userID })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             document.getElementById('questions').style.display = 'none';
@@ -251,7 +287,7 @@ async function loadSNSContent() {
         }
     } catch (error) {
         console.error('Load SNS content error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }
 
@@ -272,12 +308,18 @@ async function loadOldData() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+                'Authorization': `Bearer ${N8N_API_KEY}`
             },
             body: JSON.stringify({ action: 'loadOldData', userID })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            const text = await response.text();
+            throw new Error(`Invalid JSON response: ${text}`);
+        }
 
         if (response.ok && result.status) {
             document.getElementById('questions').style.display = 'none';
@@ -299,6 +341,6 @@ async function loadOldData() {
         }
     } catch (error) {
         console.error('Load old data error:', error);
-        message.textContent = `Lỗi kết nối: ${error.message}`;
+        message.textContent = error.message || 'Lỗi kết nối';
     }
 }

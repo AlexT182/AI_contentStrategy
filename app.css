@@ -45,7 +45,7 @@ h2, h3 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
-    gap: 30px; /* Tăng khoảng cách giữa chữ và nút */
+    gap: 30px;
     flex-wrap: wrap;
 }
 
@@ -54,7 +54,7 @@ h2, h3 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 24px; /* Giảm font-size để cân đối */
+    font-size: 24px;
 }
 
 .form-group {
@@ -100,8 +100,8 @@ button:hover {
 }
 
 .logout-btn {
-    padding: 8px 16px; /* Giảm kích thước nút Đăng xuất */
-    font-size: 12px; /* Giảm font-size */
+    padding: 8px 16px;
+    font-size: 12px;
     background: linear-gradient(45deg, #D8BFD8, #E6E6FA);
     color: #333;
     flex-shrink: 0;
@@ -229,7 +229,7 @@ button:hover {
     }
 
     .logout-btn {
-        padding: 6px 12px; /* Giảm thêm trên mobile */
+        padding: 6px 12px;
         font-size: 11px;
     }
 
