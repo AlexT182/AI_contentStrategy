@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f'; // Thay bằng URL thực tế
+    const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f';
     const USERNAME_KEY = 'ct_username';
     const USERID_KEY = 'ct_userid';
     let currentUsername = localStorage.getItem(USERNAME_KEY);
@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentUsername && currentUserID) {
             authStatus.innerHTML = `Xin chào ${currentUsername} <span class="badge bg-success">Đã đăng nhập</span>`;
             loginBtn.textContent = 'Đăng xuất';
-            loginBtn.classList.remove('btn-outline-secondary');
+            loginBtn.classList.remove('btn-outline-secondary', 'btn-success');
             loginBtn.classList.add('btn-danger');
             inputForm.style.display = 'block';
         } else {
             authStatus.innerHTML = '';
             loginBtn.textContent = 'Đăng nhập';
-            loginBtn.classList.remove('btn-danger');
+            loginBtn.classList.remove('btn-danger', 'btn-success');
             loginBtn.classList.add('btn-outline-secondary');
             inputForm.style.display = 'none';
             questionsSection.style.display = 'none';
@@ -39,13 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function callWebhook(action, data) {
         const payload = { action, userID: currentUserID, username: currentUsername, ...data };
+        console.log('Sending payload:', payload);
         try {
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const result = await response.json();
+            const text = await response.text();
+            console.log('Raw response:', text);
+            const result = text ? JSON.parse(text) : {};
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             if (action === 'auth' && result.success && result.user && result.user.username && result.user.userID) {
                 localStorage.setItem(USERNAME_KEY, result.user.username);
@@ -62,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loginBtn.addEventListener('click', () => {
+        console.log('Login button clicked, userID:', currentUserID);
         if (currentUserID) {
             localStorage.removeItem(USERNAME_KEY);
             localStorage.removeItem(USERID_KEY);
@@ -76,29 +80,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeModal) closeModal.addEventListener('click', hideLoginModal);
     modalOverlay.addEventListener('click', hideLoginModal);
 
-    submitLogin.addEventListener('click', async () => {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+    if (submitLogin) {
+        submitLogin.addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        if (!username || !password) {
-            document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
-            return;
-        }
-
-        try {
-            showLoading();
-            const response = await callWebhook('auth', { username, password });
-            if (response.success && response.user && response.user.username && response.user.userID) {
-                hideLoginModal();
-            } else {
-                document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
+            if (!username || !password) {
+                document.getElementById('loginError').textContent = 'Vui lòng nhập đủ thông tin';
+                return;
             }
-        } catch (error) {
-            document.getElementById('loginError').textContent = 'Lỗi kết nối';
-        } finally {
-            hideLoading();
-        }
-    });
+
+            try {
+                showLoading();
+                const response = await callWebhook('auth', { username, password });
+                if (response.success && response.user && response.user.username && response.user.userID) {
+                    hideLoginModal();
+                } else {
+                    document.getElementById('loginError').textContent = response.message || 'Đăng nhập thất bại';
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Lỗi kết nối';
+            } finally {
+                hideLoading();
+            }
+        });
+    } else {
+        console.error('submitLogin element not found');
+    }
 
     inputForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -118,9 +126,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 displayQuestions(response.questions);
                 questionsSection.style.display = 'block';
                 contentsSection.style.display = 'none';
+            } else {
+                alert('Không tạo được câu hỏi: ' + (response.message || 'Lỗi không xác định'));
             }
         } catch (error) {
-            console.error('Generate questions error:', error);
+            alert('Có lỗi xảy ra khi tạo câu hỏi');
         } finally {
             hideLoading();
         }
@@ -135,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 checkSelectedCount();
             }
         } catch (error) {
-            console.error('AI select error:', error);
+            alert('Có lỗi xảy ra khi AI chọn câu');
         } finally {
             hideLoading();
         }
@@ -158,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 contentsSection.style.display = 'block';
             }
         } catch (error) {
-            console.error('Generate contents error:', error);
+            alert('Có lỗi xảy ra khi tạo nội dung');
         } finally {
             hideLoading();
         }
