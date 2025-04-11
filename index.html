@@ -2,55 +2,72 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Content Strategy</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/styles.css" type="text/css" />
 </head>
 <body>
     <!-- Login Form -->
-    <div id="login-form">
+    <div id="login-form" class="container">
         <h2>Đăng nhập</h2>
-        <input type="text" id="username" placeholder="Username" />
-        <input type="password" id="password" placeholder="Password" />
+        <div class="form-group">
+            <input type="text" id="username" placeholder="Username" />
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Password" />
+        </div>
         <button onclick="login()">Gửi</button>
-        <p id="login-message"></p>
+        <p id="login-message" class="error-message"></p>
     </div>
 
     <!-- Main Interface -->
     <div id="main" style="display: none;">
-        <h2>Xin chào <span id="username-display"></span></h2>
-        <p>Đã đăng nhập</p>
-        <button onclick="logout()">Đăng xuất</button>
+        <div class="header">
+            <h2>Xin chào <span id="username-display"></span></h2>
+            <button onclick="logout()" class="logout-btn">Đăng xuất</button>
+        </div>
 
         <!-- Input Form -->
-        <div id="input-form">
+        <div id="input-form" class="container">
             <h3>Nhập thông tin</h3>
-            <input type="text" id="product" placeholder="Sản phẩm/Dịch vụ" />
-            <input type="text" id="targetCust" placeholder="Đối tượng khách hàng" />
-            <input type="text" id="field" placeholder="Lĩnh vực kinh doanh" />
+            <div class="form-group">
+                <input type="text" id="product" placeholder="Sản phẩm/Dịch vụ" />
+            </div>
+            <div class="form-group">
+                <input type="text" id="targetCust" placeholder="Đối tượng khách hàng" />
+            </div>
+            <div class="form-group">
+                <input type="text" id="field" placeholder="Lĩnh vực kinh doanh" />
+            </div>
             <button onclick="submitInput()">Gửi</button>
-            <p id="input-message"></p>
+            <p id="input-message" class="error-message"></p>
+            <button id="continue-btn" style="display: none;" onclick="loadQuestions()">Tiếp tục</button>
         </div>
 
         <!-- Questions List -->
-        <div id="questions" style="display: none;">
+        <div id="questions" class="container" style="display: none;">
             <h3>Danh sách câu hỏi</h3>
             <div id="question-list"></div>
-            <button onclick="userChoose()">Chọn</button>
-            <button onclick="aiChoose()">Nhờ AI chọn</button>
-            <p id="question-message"></p>
+            <div class="action-buttons">
+                <button onclick="userChoose()">Chọn</button>
+                <button onclick="aiChoose()">Nhờ AI chọn</button>
+            </div>
+            <p id="question-message" class="error-message"></p>
         </div>
 
         <!-- SNS Content -->
-        <div id="sns-content" style="display: none;">
+        <div id="sns-content" class="container" style="display: none;">
             <h3>Nội dung SNS</h3>
             <div id="content-list"></div>
-            <button onclick="getSheetLink()">Gửi link Google Sheet</button>
-            <button onclick="loadOldData()">Load dữ liệu cũ</button>
-            <p id="sns-message"></p>
+            <div class="action-buttons">
+                <button onclick="getSheetLink()">Gửi link Google Sheet</button>
+                <button onclick="loadOldData()">Load dữ liệu cũ</button>
+            </div>
+            <p id="sns-message" class="error-message"></p>
         </div>
     </div>
 
-    <script src="scripts.js"></script>
+    <script src="/scripts.js"></script>
 </body>
 </html>
