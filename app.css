@@ -1,0 +1,214 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 100%); /* Gradient tím nhẹ */
+    color: #333;
+    line-height: 1.6;
+    padding: 30px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    max-width: 960px;
+    width: 100%;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(128, 0, 128, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(128, 0, 128, 0.3);
+}
+
+h2, h3 {
+    color: #800080; /* Tím đậm */
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #D8BFD8; /* Tím nhạt */
+    border-radius: 8px;
+    font-size: 16px;
+    background: #F8F8FF;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #800080;
+    box-shadow: 0 0 10px rgba(128, 0, 128, 0.4);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+button {
+    padding: 16px 32px;
+    background: linear-gradient(45deg, #800080, #BA55D3); /* Gradient tím */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(45deg, #6A006A, #9932CC);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(128, 0, 128, 0.4);
+}
+
+.logout-btn {
+    background: linear-gradient(45deg, #D8BFD8, #E6E6FA);
+    color: #333;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(45deg, #C0A0C0, #D8BFD8);
+    transform: translateY(-4px);
+}
+
+.error-message {
+    color: #D8000C;
+    min-height: 24px;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.question-list div {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(90deg, #F8F8FF, #F0F0FF);
+    border-radius: 10px;
+    border-left: 6px solid #800080;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.question-list div:hover {
+    background: linear-gradient(90deg, #F0F0FF, #E6E6FA);
+    transform: translateY(-4px);
+}
+
+.question-list input[type="checkbox"] {
+    margin-right: 25px;
+    transform: scale(1.4);
+    cursor: pointer;
+}
+
+.question-list input[type="text"] {
+    flex: 1;
+    padding: 12px;
+}
+
+.content-list .content-card {
+    background: linear-gradient(90deg, #F8F8FF, #F0F0FF);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 10px;
+    border-left: 6px solid #800080;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(128, 0, 128, 0.3);
+}
+
+.content-card p {
+    margin: 12px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.content-card strong {
+    color: #800080;
+    font-weight: 600;
+}
+
+.action-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 25px;
+        margin: 15px;
+    }
+
+    button {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .question-list div, .content-card {
+        padding: 15px;
+        margin: 15px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+    }
+
+    input[type="text"], input[type="password"] {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
