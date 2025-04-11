@@ -19,17 +19,17 @@ async function login() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // Nếu webhook yêu cầu API key, thêm vào đây
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'auth', username, password })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('main').style.display = 'block';
             document.getElementById('username-display').textContent = result.username;
@@ -84,21 +84,22 @@ async function submitInput() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // Nếu webhook yêu cầu API key, thêm vào đây
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'validateInput', userID, product, targetCust, field })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             message.textContent = 'Dữ liệu hợp lệ! Nhấn Tiếp tục để xem câu hỏi.';
             message.style.color = '#008000';
             continueBtn.style.display = 'block';
         } else {
+            // Hiển thị message từ WF thay vì thông báo chung chung
             message.textContent = result.message || 'Dữ liệu không hợp lệ';
             message.style.color = '#D8000C';
             continueBtn.style.display = 'none';
@@ -118,17 +119,16 @@ async function loadQuestions() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'getQuestions', userID })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             document.getElementById('input-form').style.display = 'none';
             document.getElementById('questions').style.display = 'block';
             const questionList = document.getElementById('question-list');
@@ -166,17 +166,16 @@ async function userChoose() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'userChoice', userID, questions })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             sheetLink = result.sheetLink;
             await loadSNSContent();
         } else {
@@ -195,17 +194,16 @@ async function aiChoose() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'aiChoice', userID })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             sheetLink = result.sheetLink;
             await loadSNSContent();
         } else {
@@ -224,17 +222,16 @@ async function loadSNSContent() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'getSNSContent', userID })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             document.getElementById('questions').style.display = 'none';
             document.getElementById('sns-content').style.display = 'block';
             const contentList = document.getElementById('content-list');
@@ -273,17 +270,16 @@ async function loadOldData() {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_N8N_API_KEY'
+            },
             body: JSON.stringify({ action: 'loadOldData', userID })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
 
-        if (result.status) {
+        if (response.ok && result.status) {
             document.getElementById('questions').style.display = 'none';
             document.getElementById('sns-content').style.display = 'block';
             const contentList = document.getElementById('content-list');
