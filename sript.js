@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook-test/36dbb972-ca19-48ac-bd79-8ab661b88d4f'; // Thay bằng URL thực tế
+    const WEBHOOK_URL = 'https://rabbitbase.alphabot.vn/webhook/36dbb972-ca19-48ac-bd79-8ab661b88d4f'; // Thay bằng URL thực tế
     const USERNAME_KEY = 'ct_username';
     const USERID_KEY = 'ct_userid';
     let currentUsername = localStorage.getItem(USERNAME_KEY);
